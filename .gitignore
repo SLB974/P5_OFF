@@ -1,0 +1,6 @@
+.env/
+.vscode/
+env.py
+Bruno
+__pycache__
+

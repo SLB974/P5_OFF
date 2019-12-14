@@ -1,3 +1,6 @@
-import constants as ct
+# coding: utf-8
+import orm
 
-print(ct.connection_source)
+conn = orm.Connection()
+conn.add_categories()
+conn.add_products()
