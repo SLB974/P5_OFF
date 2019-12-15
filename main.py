@@ -1,6 +1,6 @@
 # coding: utf-8
-import orm
+import zoff_scrapper
 
-conn = orm.Connection()
-conn.add_categories()
-conn.add_products()
+conn = zoff_scrapper.OFF_scrapper()
+conn.add_choosen_categories()
+conn.add_product_records()

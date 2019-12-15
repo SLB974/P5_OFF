@@ -11,7 +11,7 @@ from sqlalchemy import create_engine
 Manage ORM
 """
 engine = create_engine(ct.connection_source)
-session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine)
 Base = declarative_base()
 metadata = Base.metadata
 
@@ -21,10 +21,6 @@ class Category(Base):
 
     id = Column(INTEGER(10), primary_key=True)
     categories_fr = Column(String(250), nullable=False)
-
-    def __init__(self, id, categories_fr):
-        self.id = id
-        self.categories_fr = categories_fr
 
 
 class Product(Base):
@@ -42,22 +38,6 @@ class Product(Base):
 
     category = relationship('Category')
 
-    def __repr__(self):
-        return "<Product(code='%s', url='%s', brands='%s',product_name='%s', category_id='%s', product_quantity='%s', nutrition_grade_fr='%s', stores='%s')>" % (self.code, self.url, self.brands, self.product_name, self.category_id, self.nutrition_grade_fr, self.stores)
-
-    def __init__(self, id, code, url, brands, product_name, category_id,
-                 product_name, product_quantity, nutrition_grade_fr, stores):
-
-        self.id = id
-        self.code = code
-        self.url
-        self.brands = brands
-        self.product_name = product_name
-        self.category_id = category_id
-        self.product_quantity = product_quantity
-        self.nutrition_grade_fr = nutrition_grade_fr
-        self.stores = stores
-
 
 class ProductSave(Base):
     __tablename__ = 'product_save'
@@ -72,8 +52,3 @@ class ProductSave(Base):
         'Product', primaryjoin='ProductSave.product_id == Product.id')
     product_replace = relationship(
         'Product', primaryjoin='ProductSave.product_replace_id == Product.id')
-
-    def __init__(self, date, product_id, product_replace_id):
-        self.date = date
-        self.product_id = product_id
-        self.product_replace_id = product_replace_id

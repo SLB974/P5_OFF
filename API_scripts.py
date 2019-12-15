@@ -1,7 +1,6 @@
 # coding: utf-8
 import constants as ct
 import requests
-import json
 
 
 class Api_consult:
@@ -15,7 +14,7 @@ class Api_consult:
         self.count = 0
         self.pages = 0
 
-    def api_get_results(self, category, page):
+    def api_get_results(self, category, page=1):
         """
         API's GET consultation
         """
@@ -34,9 +33,7 @@ class Api_consult:
         return response
 
     def calculate_pages(self, records):
-        """
-        calculate how many pages to reach every record
-        """
+        """ calculate on how many pages to fetch records """
         records = int(records/20)
         if records > 10:
             records = 2
