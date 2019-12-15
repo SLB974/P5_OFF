@@ -1,8 +1,6 @@
 # coding: utf-8
 from sqlalchemy import inspect
-from orm import Session, engine, Base
-from orm import Category, Product
-from constants import connection_source
+from orm import Session, Category, Product
 from constants import categories
 from API_scripts import Api_consult
 
@@ -11,9 +9,7 @@ class OFF_scrapper:
 
     def __init__(self):
 
-        Base.metadata.create_all(engine)
         self.session = Session()
-        # self.Api = API_scripts.Api_consult()
 
     def add_choosen_categories(self):
         """ Adding categories choosed from constants.categories """
@@ -42,14 +38,11 @@ class OFF_scrapper:
         # Loop on records in Category()
         for instance in self.fetch_categories():
 
-            # Get API' response
-            response = api.api_get_results(instance["category"])
-
             # Loop on pages
-            for page in range(1, api.pages):
+            for page in range(api.pages):
 
-                if page != 1:
-                    response = api.api_get_results(instance["category"], page)
+                # Get API' response
+                response = api.api_get_results(instance["category"], page+1)
 
                 # Loop on records
                 for record in response["products"]:

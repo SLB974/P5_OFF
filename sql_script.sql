@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS off_db
 ;
 CREATE DATABASE off_db
 CHARACTER
-SET 'utf8';
+SET 'utf8mb4';
 USE off_db;
 
 CREATE TABLE category
