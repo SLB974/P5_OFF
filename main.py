@@ -1,6 +1,5 @@
 # coding: utf-8
-import off_scrapper
+from off.display import Home_scr
+from off._constants import mess1
 
-conn = off_scrapper.OFF_scrapper()
-conn.add_choosen_categories()
-conn.add_product_records()
+screen = Home_scr(mess1)
