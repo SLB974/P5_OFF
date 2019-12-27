@@ -43,8 +43,6 @@ class Off_scrapper:
                               if k in mapper.attrs and k != "id"}
 
                     record["category_id"] = instance["id"]
-                    string = record['product_name'].lower()
-                    string = string.strip()
                     doubled_v.append(record['product_name'].lower().strip())
 
                     yield record
