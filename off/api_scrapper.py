@@ -2,8 +2,8 @@
 from off.my_constants import conn_source, criterias
 import requests
 from sqlalchemy import inspect
-from off.orm import Product
-from off.db_staff import Db_fetch
+from off.orm import Product, Session, Category
+# from off.db_staff import Db_fetch
 
 
 class Api_consult:
@@ -16,6 +16,7 @@ class Api_consult:
         self.source = conn_source
         self.doubled_code = set()
         self.doubled_name = set()
+        self.session = Session()
 
     def get_results(self, category):
         """
@@ -38,15 +39,15 @@ class Api_consult:
 
         # Create a mapper that references Product()'s Columns
         mapper = inspect(Product())
-        db = Db_fetch()
+        # db = Db_fetch()
 
         # Loop on categories
-        for instance in db.fetch_categories():
+        for instance in self.session.query(Category).order_by(Category.id):
 
             print("Filling products for Category " +
-                  str(instance['category'])+"...")
+                  str(instance.category)+"...")
 
-            response = self.get_results(instance["category"])
+            response = self.get_results(instance.category)
 
             # Loop on records in API's response
             for record in response["products"]:
@@ -71,4 +72,4 @@ class Api_consult:
                     self.doubled_code.add(record_products['code'])
 
                     yield record_products, record_categories, \
-                        record_stores, instance["id"]
+                        record_stores, instance.id

@@ -63,10 +63,10 @@ class Db_fetch(Db_off):
 
 class Db_write(Db_off):
 
-    def __init__(self, doubled_category, doubled_store):
+    def __init__(self):
 
-        self.doubled_category = doubled_category
-        self.doubled_store = doubled_store
+        self.doubled_category = set()
+        self.doubled_store = set()
 
         Db_off.__init__(self)
 
