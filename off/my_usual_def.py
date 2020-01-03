@@ -35,3 +35,21 @@ def exit_script():
     """ usual method to exit """
 
     sys.exit()
+
+
+def is_category_fr(category):
+
+    if 'en:' in category:
+        return False
+
+    if 'es:' in category:
+        return False
+
+    if 'pl:' in category:
+        return False
+
+    return True
+
+
+def format_category(category):
+    return category.replace('fr:', '')

@@ -1,12 +1,11 @@
 # coding: utf-8
-from off.sfc import conninfo
+from env import login, password, host, dbase
+from env import quantity_of_records_to_fetch
 
 """
 Constants for off_api
 """
-
-connection_source = f"mysql://root:{conninfo}@localhost/off_db?charset=utf8mb4"
-connection_source2 = f"mysql://root:{conninfo}@localhost/off_db2?charset=utf8mb4"
+conn_source = f"mysql://{login}:{password}@{host}/{dbase}?charset=utf8mb4"
 categories = ["Fromages blancs", "Poissons fumés", "Nouilles",
               "Pizzas", "Boissons"]
 criterias = {
@@ -30,8 +29,14 @@ criterias = {
     'tagtype_5': 'product_name',
     'tag_contains_5': 'does_not_contain',
     'tag_5': None,
+    'tagtype_6': 'categories_lc',
+    'tag_contains_6': 'contains',
+    'tag_6': 'fr',
+    'tagtype_7': 'labels_lc',
+    'tag_contains_7': 'contains',
+    'tag_7': 'fr',
     # 'sort_by': 'unique_scans_n',
-    'page_size': 0,
+    'page_size': quantity_of_records_to_fetch,
     'json': 1
 }
 mess = "\n 0 - Quitter l'application\n\n"

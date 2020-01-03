@@ -1,9 +1,8 @@
 # coding: utf-8
-from off._usual_def import clear_screen, exit_script, format_for_screen
-from off._constants import mess, mess0, mess1, mess2, mess3, mess4, mess5
-from off._constants import mess6, mess7, mess8
+from off.my_usual_def import clear_screen, exit_script, format_for_screen
+from off.my_constants import mess, mess0, mess1, mess2, mess3, mess4, mess5
+from off.my_constants import mess6, mess7, mess8
 from off.orm import Session, Category, Product, engine
-from sqlalchemy.sql import text
 from off.db_staff import Db_off
 
 
@@ -75,10 +74,10 @@ class Home_scr(Screen):
     def action(self, option):
 
         if option == 1:
-            cs = Category_scr(mess2)
+            Category_scr(mess2)
 
         if option == 2:
-            hs = History_scr(mess5)
+            History_scr(mess5)
 
 
 class Category_scr(Screen):
@@ -94,7 +93,7 @@ class Category_scr(Screen):
 
     def action(self, option):
 
-        ps = Product_scr(mess3, option)
+        Product_scr(mess3, option)
 
 
 class Product_scr(Screen):
@@ -111,7 +110,7 @@ class Product_scr(Screen):
 
     def action(self, option):
 
-        pds = Product_details_scr(mess4, option, self.id)
+        Product_details_scr(mess4, option, self.id)
 
 
 class Product_details_scr(Screen):

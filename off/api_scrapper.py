@@ -1,26 +1,44 @@
 # coding: utf-8
+from off.my_constants import conn_source, criterias
+import requests
 from sqlalchemy import inspect
-from off.api_scripts import Api_consult
-from off.db_staff import Db_off
-from off.orm import Product, Session, t_categories_t
+from off.orm import Product
+from off.db_staff import Db_fetch
 
 
-class Off_scrapper:
+class Api_consult:
+
+    """
+    Manage API's consultations
+    """
 
     def __init__(self):
+        self.source = conn_source
+        self.doubled_code = set()
+        self.doubled_name = set()
 
-        self.session = Session()
+    def get_results(self, category):
+        """
+        API's GET consultation
+        parameters :
+        category = searching category
+        quantity = number of results
+        """
+        url = "https://fr.openfoodfacts.org/cgi/search.pl?"
 
-    def fetch_api_products(self):
-        """ Fetch products from API """
+        criterias['tag_1'] = category
+
+        response = requests.get(url, params=criterias)
+        response = response.json()
+
+        return response
+
+    def api_scrapp_and_clean(self):
+        """ Fetch products from API and clean datas for export to database"""
 
         # Create a mapper that references Product()'s Columns
         mapper = inspect(Product())
-        db = Db_off()
-        api = Api_consult()
-
-        # inject my_categories in database
-        db.add_my_categories()
+        db = Db_fetch()
 
         # Loop on categories
         for instance in db.fetch_categories():
@@ -28,31 +46,29 @@ class Off_scrapper:
             print("Filling products for Category " +
                   str(instance['category'])+"...")
 
-            response = api.get_results(instance["category"], 15)
-
-            doubled_v = []
+            response = self.get_results(instance["category"])
 
             # Loop on records in API's response
             for record in response["products"]:
 
-                if record['product_name'].lower().strip() not in doubled_v and \
-                    'nutrition_grade_fr' in record and \
-                        record['nutrition_grade_fr'] != '':
+                if record['product_name'].lower().strip() not in \
+                    self.doubled_name and record['code'] not in \
+                        self.doubled_code and 'nutrition_grade_fr' in record \
+                        and record['nutrition_grade_fr'] != '':
 
-                    record = {k: v for (k, v) in record.items()
-                              if k in mapper.attrs and k != "id"}
+                    record_categories = record['categories'].split(',')
+                    record_categories = (
+                        v for v in record_categories if v != '')
 
-                    record["category_id"] = instance["id"]
-                    doubled_v.append(record['product_name'].lower().strip())
+                    record_stores = record['stores'].split(',')
+                    record_stores = (v for v in record_stores if v != '')
 
-                    yield record
+                    record_products = {k: v for (k, v) in record.items()
+                                       if k in mapper.attrs and k != "id"}
 
-    def add_product_records(self):
-        """ save products in database """
+                    self.doubled_name.add(
+                        record_products['product_name'].lower().strip())
+                    self.doubled_code.add(record_products['code'])
 
-        for record in self.fetch_api_products():
-            # print(record)
-            insertion = Product(**record)
-            self.session.add(insertion)
-
-        self.session.commit()
+                    yield record_products, record_categories, \
+                        record_stores, instance["id"]

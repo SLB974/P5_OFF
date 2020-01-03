@@ -1,5 +1,12 @@
 # coding: utf-8
-from off.api_scrapper import Off_scrapper
+from off.db_staff import Db_write
 
-conn = Off_scrapper()
-conn.add_product_records()
+
+def main():
+    db = Db_write()
+    db.add_my_categories()
+    db.add_product_records()
+
+
+if __name__ == '__main__':
+    main()
