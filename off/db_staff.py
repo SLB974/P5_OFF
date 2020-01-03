@@ -17,6 +17,18 @@ class Db_off:
         self.category_id = 0
         self.store_id = 0
 
+    def fetch_store_id(self, store=''):
+        """ Fetch id for specified store """
+        for instance in self.session.query(Store).filter(
+                Store.store == store):
+            return instance.id
+
+    def fetch_category_id(self, cat=''):
+        """ fetch id for specified category """
+        for instance in self.session.query(Category).filter(
+                Category.category == cat):
+            return instance.id
+
 
 class Db_fetch(Db_off):
 
@@ -48,18 +60,6 @@ class Db_fetch(Db_off):
         return self.session.query(Product).filter(
             Product.category_id == id)
 
-    def fetch_store_id(self, store=''):
-        """ Fetch id for specified store """
-        for instance in self.session.query(Store).filter(
-                Store.store == store):
-            return instance.id
-
-    def fetch_category_id(self, cat=''):
-        """ fetch id for specified category """
-        for instance in self.session.query(Category).filter(
-                Category.category == cat):
-            return instance.id
-
 
 class Db_write(Db_off):
 
@@ -67,7 +67,6 @@ class Db_write(Db_off):
 
         self.doubled_category = set()
         self.doubled_store = set()
-
         Db_off.__init__(self)
 
     def add_my_categories(self):
@@ -98,9 +97,9 @@ class Db_write(Db_off):
             self.session.flush()
             self.product_id = insertion.id
 
-            insertion = CategoriesT(
-                product_id=self.product_id, category_id=self.category_id)
-            self.session.add(insertion)
+            # insertion = CategoriesT(
+            #     product_id=self.product_id, category_id=self.category_id)
+            # self.session.add(insertion)
 
             self.add_categories_record(record_categories)
             self.add_stores_record(record_stores)
@@ -115,14 +114,19 @@ class Db_write(Db_off):
             instance = instance.strip()
             instance = format_category(instance)
 
-            if instance.lower().strip() not in self.doubled_category \
-                    and is_category_fr(instance):
+            if is_category_fr(instance):
 
-                insertion = Category(category=instance, my_category=0)
-                self.session.add(insertion)
-                self.session.flush()
-                self.category_id = insertion.id
-                self.doubled_category.add(instance.lower().strip())
+                if instance.lower().strip() not in self.doubled_category:
+
+                    insertion = Category(category=instance, my_category=0)
+                    self.session.add(insertion)
+                    self.session.flush()
+                    self.category_id = insertion.id
+                    self.doubled_category.add(instance.lower().strip())
+
+                else:
+
+                    self.category_id = self.fetch_category_id(instance)
 
                 self.add_product_category()
 
@@ -138,14 +142,18 @@ class Db_write(Db_off):
 
             instance = instance.strip()
 
-            if instance.lower().strip() not in self.doubled_store \
-                    and instance != '':
+            if instance != '':
 
-                insertion = Store(store=str(instance))
-                self.session.add(insertion)
-                self.session.flush()
-                self.store_id = insertion.id
-                self.doubled_store.add(instance.lower().strip())
+                if instance.lower().strip() not in self.doubled_store:
+
+                    insertion = Store(store=str(instance))
+                    self.session.add(insertion)
+                    self.session.flush()
+                    self.store_id = insertion.id
+                    self.doubled_store.add(instance.lower().strip())
+
+                else:
+                    self.store_id = self.fetch_store_id(instance)
 
                 self.add_product_store()
 
