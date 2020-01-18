@@ -11,39 +11,59 @@ from sqlalchemy.orm import aliased
 
 class Db_off:
 
-    """ Mother Class for consulting and writing in database """
+    """ Mother Class for consulting and writing in database 
+
+    Class variables:
+    ---------------
+        session     :   initialize a Session to ORM
+        product_id  :   integer to reference product id in use
+        category_id :   integer to reference catefory_id in use
+        store_id    :   integer to reference store id in use
+
+    """
 
     def __init__(self):
         self.session = Session()
         self.product_id = 0
         self.category_id = 0
-        self.store_id = 0
+        self.store_idstore_id = 0
 
     def fetch_store_id(self, store=''):
         """ Fetch id for specified store """
-        for instance in (self.session.query(Store)
-                         . filter(Store.store == store)
-                         ):
-            return instance.id
+
+        instance = (self.session.query(Store)
+                    . filter(Store.store == store)
+                    .first()
+                    )
+
+        return instance.id
 
     def fetch_category_id(self, cat=''):
         """ fetch id for specified category """
-        for instance in (self.session.query(Category)
-                         .filter(Category.category == cat)
-                         ):
-            return instance.id
 
-    def fetch_last_replacement(self):
-        query = (self.session.query
-                 (ProductSave.id)
-                 .order_by(ProductSave.id.desc())
-                 .first()
-                 )
+        instance = (self.session.query(Category)
+                    .filter(Category.category == cat)
+                    .first()
+                    )
 
-        return query.ProductSave.id
+        return instance.id
+
+    def reset_database(self):
+        """ delete records from every table """
+
+        self.session.query(CategoriesT).delete(synchronize_session=False)
+        self.session.query(StoresT).delete(synchronize_session=False)
+        self.session.query(ProductSave).delete(synchronize_session=False)
+        self.session.query(Store).delete(synchronize_session=False)
+        self.session.query(Category).delete(synchronize_session=False)
+        self.session.query(Product).delete(synchronize_session=False)
+        self.session.commit()
+        self.session.close()
 
 
 class Db_fetch(Db_off):
+
+    """ Class for fetching database """
 
     def __init__(self):
 
@@ -124,21 +144,8 @@ class Db_fetch(Db_off):
         else:
             return randomrow.id
 
-    def fetch_replacement_details(self, replacement_id):
-        """ Fetch details of replacement """
-
-        Prod_rep = aliased(Product)
-
-        return (self.session.query
-                (Product.product_name,
-                 Prod_rep.product_name)
-                .filter(ProductSave.id == replacement_id)
-                .filter(ProductSave.product_id == Product.id)
-                .filter(ProductSave.product_replace_id == Prod_rep.id)
-                .first()
-                )
-
     def fetch_replacement_records(self):
+        """ Fetch replacement recorded in database """
 
         Prod_rep = aliased(Product)
 
@@ -153,6 +160,8 @@ class Db_fetch(Db_off):
 
 
 class Db_write(Db_off):
+
+    """ Class for recording in database """
 
     def __init__(self):
 
@@ -195,6 +204,7 @@ class Db_write(Db_off):
         self.session.close()
 
     def add_categories_record(self, record_categories):
+        """ add referenced categories in product records """
 
         for instance in record_categories:
 
@@ -218,12 +228,14 @@ class Db_write(Db_off):
                 self.add_product_category()
 
     def add_product_category(self):
+        """ add categories linked with product in table CategoriesT """
 
         insertion = CategoriesT(
             product_id=self.product_id, category_id=self.category_id)
         self.session.add(insertion)
 
     def add_stores_record(self, record_stores):
+        """ add referenced stores in product's records """
 
         for instance in record_stores:
 
@@ -245,6 +257,7 @@ class Db_write(Db_off):
                 self.add_product_store()
 
     def add_product_store(self):
+        """ add stores linked with product in table CategoriesT """
 
         insertion = StoresT(product_id=self.product_id,
                             store_id=self.store_id)

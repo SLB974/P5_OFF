@@ -7,7 +7,7 @@ Constants for off_api
 """
 conn_source = f"mysql://{login}:{password}@{host}/{dbase}?charset=utf8mb4"
 categories = ["Fromages blancs", "Poissons", "Nouilles",
-              "Pizzas", "Boissons"]
+              "Pizzas", "Boissons", "Epicerie"]
 criterias = {
     'search_simple': 1,
     'action': 'process',

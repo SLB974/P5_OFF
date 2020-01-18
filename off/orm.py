@@ -13,7 +13,7 @@ Manage ORM
 engine = create_engine(conn_source)
 Session = sessionmaker(bind=engine, autoflush=True)
 Base = declarative_base()
-metadata = Base.metadata
+# metadata = Base.metadata
 
 
 class Category(Base):

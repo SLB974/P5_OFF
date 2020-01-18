@@ -33,14 +33,17 @@ def format_string(value):
 
 
 def format_for_screen(id, field):
+    """ usual function to format string for terminal """
 
     return format_number(id) + ' - ' + format_string(field)
 
 
 def is_category_fr(category):
+    """ usual function to reject non fr languages """
 
     return all((not category.startswith(lg) for lg in ("en:", "es:", "pl:")))
 
 
 def format_category(category):
+    """ usual function to remove fr from categories known as fr """
     return category.replace('fr:', '')

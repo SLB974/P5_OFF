@@ -1,9 +1,7 @@
 # coding: utf-8
 from off.my_usual_def import clear_screen, exit_script, format_for_screen
 from off.my_constants import mess0
-# from off.my_constants import labelsp
-from off.orm import Session, Category, Product
-from off.db_staff import Db_off, Db_fetch, Db_write
+from off.db_staff import Db_fetch, Db_write
 import jinja2
 
 
@@ -35,15 +33,12 @@ class Screen:
         self.references = {}
         self.list_ref = {}
         self.list_item = []
-        # self.session = Session()
-        # self.db = Db_off()
         self.dbf = Db_fetch()
         self.dbw = Db_write()
 
     def fill_references(self, m_query):
         """ Fill references, list_ref, and list_item
             from database query
-
             Parameter :     m_query (recordet)
         """
 
@@ -305,6 +300,5 @@ class History_scr(Screen):
         self.list_ref = {'1': 1}
 
     def action(self, option):
-        """ Manage what to do regarding response. """
 
         Home_scr()
