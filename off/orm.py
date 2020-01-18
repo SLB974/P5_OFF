@@ -1,6 +1,6 @@
 # coding: utf-8
 from off.my_constants import conn_source
-from sqlalchemy import CHAR, Column, DateTime, ForeignKey, String, Table
+from sqlalchemy import CHAR, Column, ForeignKey, String
 from sqlalchemy import create_engine, Index, Boolean
 from sqlalchemy.dialects.mysql import INTEGER
 from sqlalchemy.orm import relationship
@@ -25,6 +25,14 @@ class Category(Base):
     my_category = Column(Boolean)
 
 
+class Store(Base):
+    __tablename__ = 'store'
+
+    id = Column(INTEGER(10), primary_key=True,
+                autoincrement=True, nullable=True)
+    store = Column(String(250), nullable=False, unique=True)
+
+
 class Product(Base):
     __tablename__ = 'product'
 
@@ -38,28 +46,21 @@ class Product(Base):
     nutrition_grade_fr = Column(CHAR(1))
 
 
-class Store(Base):
-    __tablename__ = 'store'
-
-    id = Column(INTEGER(10), primary_key=True,
-                autoincrement=True, nullable=True)
-    store = Column(String(250), nullable=False, unique=True)
-
-
 class ProductSave(Base):
     __tablename__ = 'product_save'
 
     id = Column(INTEGER(10), primary_key=True)
-    date = Column(DateTime, nullable=False)
     product_id = Column(ForeignKey('product.id'), nullable=False, index=True)
     product_replace_id = Column(ForeignKey('product.id'),
                                 nullable=False, index=True)
 
-    product = relationship('Product',
-                           primaryjoin='ProductSave.product_id == Product.id')
-    product_replace = relationship('Product',
-                                   primaryjoin='ProductSave.product_replace_id \
-                                       == Product.id')
+    product = (relationship
+               ('Product',
+                primaryjoin='ProductSave.product_id == Product.id'))
+
+    prod_rep = (relationship
+                ('Product',
+                 primaryjoin='ProductSave.product_replace_id == Product.id'))
 
 
 class CategoriesT(Base):
@@ -69,7 +70,7 @@ class CategoriesT(Base):
     )
 
     id = Column(INTEGER(10), primary_key=True)
-    product_id = Column(ForeignKey('product.id'))
+    product_id = Column(ForeignKey('product.id'), index=True)
     category_id = Column(ForeignKey('category.id'), index=True)
 
     category = relationship('Category')
@@ -83,7 +84,7 @@ class StoresT(Base):
     )
 
     id = Column(INTEGER(10), primary_key=True)
-    product_id = Column(ForeignKey('product.id'))
+    product_id = Column(ForeignKey('product.id'), index=True)
     store_id = Column(ForeignKey('store.id'), index=True)
 
     product = relationship('Product')

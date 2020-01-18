@@ -1,0 +1,10 @@
+-------------------------------------------------------------------------
+Voici les informations concernant le produit que vous avez choisi :
+-------------------------------------------------------------------------
+
+Dénomination : {{product_name}}
+Code         : {{code}}
+Url          : {{url}}
+Marque(s)    : {{brands}}
+Quantité     : {{product_quantity}}
+Nutriscore   : {{nutrition_grade_fr}}

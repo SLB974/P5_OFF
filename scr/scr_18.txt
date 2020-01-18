@@ -1,0 +1,9 @@
+---------------------------------------------------------------
+La substitution a bien été enregistrée dans la base de données.
+
+Veuillez faire un choix dans la liste ci-dessous :
+---------------------------------------------------------------
+
+0 - Quitter l'application
+1 - Retour à l'écran d'accueil
+

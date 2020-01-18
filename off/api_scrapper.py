@@ -3,7 +3,6 @@ from off.my_constants import conn_source, criterias
 import requests
 from sqlalchemy import inspect
 from off.orm import Product, Session, Category
-# from off.db_staff import Db_fetch
 
 
 class Api_consult:
@@ -39,7 +38,6 @@ class Api_consult:
 
         # Create a mapper that references Product()'s Columns
         mapper = inspect(Product())
-        # db = Db_fetch()
 
         # Loop on categories
         for instance in self.session.query(Category).order_by(Category.id):

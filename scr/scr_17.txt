@@ -1,0 +1,11 @@
+-------------------------------------------------------------------------
+Bravo ! Vous avez choisi un produit pour lequel il n'existe
+aucun article de substitution meilleur pour la santé dans
+notre base de données.
+
+Veuillez faire un choix dans la liste ci-dessous :
+-------------------------------------------------------------------------
+
+0 - Quitter l'application
+1 - Revenir à l'écran précédent
+

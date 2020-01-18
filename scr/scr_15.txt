@@ -1,0 +1,15 @@
+-------------------------------------------------------------------------
+Nous vous proposons de remplacer le produit que vous avez choisi par 
+cet aliment meilleur pour la santé considérant son Nutriscore :
+-------------------------------------------------------------------------
+
+Dénomination : {{product_name}}
+Code         : {{code}}
+Url          : {{url}}
+Marque(s)    : {{brands}}
+Quantité     : {{product_quantity}}
+Nutriscore   : {{nutrition_grade_fr}}
+
+-------------------------------------------------------------------------
+Vous pouvez acheter ce produits dans la ou les enseigne(s) suivante(s) :
+-------------------------------------------------------------------------

@@ -10,6 +10,12 @@ def clear_screen():
     os.system('cls')
 
 
+def exit_script():
+    """ usual method to exit """
+
+    sys.exit()
+
+
 def format_number(value):
     """ usual function format headline number """
 
@@ -31,24 +37,9 @@ def format_for_screen(id, field):
     return format_number(id) + ' - ' + format_string(field)
 
 
-def exit_script():
-    """ usual method to exit """
-
-    sys.exit()
-
-
 def is_category_fr(category):
 
-    if 'en:' in category:
-        return False
-
-    if 'es:' in category:
-        return False
-
-    if 'pl:' in category:
-        return False
-
-    return True
+    return all((not category.startswith(lg) for lg in ("en:", "es:", "pl:")))
 
 
 def format_category(category):

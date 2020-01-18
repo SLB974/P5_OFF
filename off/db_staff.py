@@ -1,10 +1,12 @@
 # coding: utf-8
+import random
 from off.my_constants import categories
 from off.my_usual_def import format_category, is_category_fr
 from off.api_scrapper import Api_consult
 from off.orm import Session, Product, Category, Store
-# from off.orm import ProductSave
+from off.orm import ProductSave
 from off.orm import CategoriesT, StoresT
+from sqlalchemy.orm import aliased
 
 
 class Db_off:
@@ -19,15 +21,26 @@ class Db_off:
 
     def fetch_store_id(self, store=''):
         """ Fetch id for specified store """
-        for instance in self.session.query(Store).filter(
-                Store.store == store):
+        for instance in (self.session.query(Store)
+                         . filter(Store.store == store)
+                         ):
             return instance.id
 
     def fetch_category_id(self, cat=''):
         """ fetch id for specified category """
-        for instance in self.session.query(Category).filter(
-                Category.category == cat):
+        for instance in (self.session.query(Category)
+                         .filter(Category.category == cat)
+                         ):
             return instance.id
+
+    def fetch_last_replacement(self):
+        query = (self.session.query
+                 (ProductSave.id)
+                 .order_by(ProductSave.id.desc())
+                 .first()
+                 )
+
+        return query.ProductSave.id
 
 
 class Db_fetch(Db_off):
@@ -37,28 +50,106 @@ class Db_fetch(Db_off):
         Db_off.__init__(self)
 
     def fetch_categories(self):
-        """ Fetch categories from table category """
+        """ Fetch my categories from table category """
 
-        for instance in self.session.query(Category).order_by(Category.id):
-            dict0 = {}
-            dict0['id'] = instance.id
-            dict0['category'] = instance.category
-            yield dict0
+        return (self.session.query
+                (Category.id, Category.category.label('reference'))
+                .filter(Category.my_category == True)
+                .order_by(Category.category)
+                .all()
+                )
 
-    def fetch_products(self, category):
+    def fetch_products(self, cat_id):
         """ Fetch products for specified category """
 
-        for instance in self.session.query(Product).filter(
-                Product.category_id == category).order_by(Product.id):
-            dict0 = {}
-            dict0[str(instance.id)] = instance.product_name
-            yield dict0
+        return (self.session.query
+                (Product.id, Product.product_name.label('reference'))
+                .filter(Product.id == CategoriesT.product_id)
+                .filter(CategoriesT.category_id == cat_id)
+                .order_by(Product.product_name)
+                .all()
+                )
 
-    def fetch_product_details(self, id):
-        """ Fetch details for specified product """
+    def fetch_product_details(self, prod_id):
+        """ Fetch details for specified product id """
 
-        return self.session.query(Product).filter(
-            Product.category_id == id)
+        return (self.session.query(Product)
+                    .filter(Product.id == prod_id)
+                    .first()
+                ).__dict__
+
+    def fetch_product_categories(self, prod_id):
+        """ Fetch categories for specified product """
+
+        return (self.session.query
+                (Category.category.label('reference'))
+                .filter(Category.id == CategoriesT.category_id)
+                .filter(CategoriesT.product_id == prod_id)
+                .order_by('reference')
+                .all()
+                )
+
+    def fetch_product_stores(self, prod_id):
+        """ Fetch stores for specified product """
+
+        return (self.session.query
+                (Store.store.label('reference'))
+                .filter(Store.id == StoresT.store_id)
+                .filter(StoresT.product_id == prod_id)
+                .order_by(Store.store)
+                .all()
+                )
+
+    def fetch_product_replacement(self, prod_id, cat_id,  max_nutriscore):
+        """ Fetch random product for replacement
+            for a different product
+            in same category
+            with a minus nutriscore value
+            """
+
+        query = (self.session.query
+                 (Product.id.label('id'),
+                  Product.product_name.label('reference'))
+                 .filter(Product.id != prod_id)
+                 .filter(Product.id == CategoriesT.product_id)
+                 .filter(Product.nutrition_grade_fr < max_nutriscore)
+                 .filter(CategoriesT.category_id == cat_id)
+                 )
+
+        rowcount = query.count()
+        randomrow = query.offset(int(rowcount*random.random())).first()
+
+        if randomrow is None:
+            return 0
+        else:
+            return randomrow.id
+
+    def fetch_replacement_details(self, replacement_id):
+        """ Fetch details of replacement """
+
+        Prod_rep = aliased(Product)
+
+        return (self.session.query
+                (Product.product_name,
+                 Prod_rep.product_name)
+                .filter(ProductSave.id == replacement_id)
+                .filter(ProductSave.product_id == Product.id)
+                .filter(ProductSave.product_replace_id == Prod_rep.id)
+                .first()
+                )
+
+    def fetch_replacement_records(self):
+
+        Prod_rep = aliased(Product)
+
+        return (self.session.query
+                (ProductSave.id.label('id'),
+                 Product.product_name.label('product'),
+                 Prod_rep.product_name.label('replacement'))
+                .filter(ProductSave.product_id == Product.id)
+                .filter(ProductSave.product_replace_id == Prod_rep.id)
+                .all()
+                )
 
 
 class Db_write(Db_off):
@@ -96,10 +187,6 @@ class Db_write(Db_off):
             self.session.add(insertion)
             self.session.flush()
             self.product_id = insertion.id
-
-            # insertion = CategoriesT(
-            #     product_id=self.product_id, category_id=self.category_id)
-            # self.session.add(insertion)
 
             self.add_categories_record(record_categories)
             self.add_stores_record(record_stores)
@@ -159,5 +246,16 @@ class Db_write(Db_off):
 
     def add_product_store(self):
 
-        insertion = StoresT(product_id=self.product_id, store_id=self.store_id)
+        insertion = StoresT(product_id=self.product_id,
+                            store_id=self.store_id)
         self.session.add(insertion)
+
+    def add_product_substitution(self, prod_id, rep_id):
+
+        insertion = (ProductSave(
+            product_id=prod_id,
+            product_replace_id=rep_id)
+        )
+        self.session.add(insertion)
+        self.session.commit()
+        self.session.close()
