@@ -1,5 +1,5 @@
 # coding: utf-8
-from off.db_staff import Db_write, Db_off
+from off.db_staff import Db_write
 
 """ Demo script for original data importation in database """
 

@@ -11,7 +11,7 @@ from sqlalchemy.orm import aliased
 
 class Db_off:
 
-    """ Mother Class for consulting and writing in database 
+    """ Mother Class for fetching and writing database
 
     Class variables:
     ---------------
