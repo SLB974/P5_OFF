@@ -12,7 +12,6 @@ class Screen:
         Class variables :
         ---------------
         message     :   message that will appear in terminal
-        references  :   link item's id to item's denomination
         dict_ref    :   link order of appearance to item's id
         list_item   :   formatted items for screen
         dbf         :   initialize class for database's fetching
@@ -32,6 +31,7 @@ class Screen:
         self.message = ''
         self.dict_ref = {}
         self.list_item = []
+        self.choice = 0
         self.dbf = Db_fetch()
         self.dbw = Db_write()
 
@@ -79,7 +79,7 @@ class Screen:
 
         if response is None:
 
-            self.message_display()
+            return self.message_display()
 
         else:
 
