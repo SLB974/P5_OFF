@@ -1,12 +1,13 @@
 # coding: utf-8
 import random
-from off.my_constants import categories
-from off.my_usual_def import format_category, is_category_fr
+from off.default_constants import categories
+from off.default_functions import format_category, is_category_fr
 from off.api_scrapper import Api_consult
 from off.orm import Session, Product, Category, Store
 from off.orm import ProductSave
 from off.orm import CategoriesT, StoresT
 from sqlalchemy.orm import aliased
+from subprocess import PIPE, Popen
 
 
 class Db_off:

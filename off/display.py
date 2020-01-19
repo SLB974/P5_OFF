@@ -1,6 +1,6 @@
 # coding: utf-8
-from off.my_usual_def import clear_screen, exit_script, format_for_screen
-from off.my_constants import mess0
+from off.default_functions import clear_screen, exit_script, format_for_screen
+from off.default_constants import mess0
 from off.db_staff import Db_fetch, Db_write
 import jinja2
 
@@ -13,7 +13,7 @@ class Screen:
         ---------------
         message     :   message that will appear in terminal
         references  :   link item's id to item's denomination
-        list_ref    :   link order of appearance to item's id
+        dict_ref    :   link order of appearance to item's id
         list_item   :   formatted items for screen
         dbf         :   initialize class for database's fetching
         dbw         :   initialize class for database's writing
@@ -30,14 +30,13 @@ class Screen:
     def __init__(self):
 
         self.message = ''
-        self.references = {}
-        self.list_ref = {}
+        self.dict_ref = {}
         self.list_item = []
         self.dbf = Db_fetch()
         self.dbw = Db_write()
 
     def fill_references(self, m_query):
-        """ Fill references, list_ref, and list_item
+        """ Fill references, dict_ref, and list_item
             from database query
             Parameter :     m_query (recordet)
         """
@@ -46,8 +45,7 @@ class Screen:
 
         for record in m_query:
 
-            self.references[str(record.id)] = record.reference
-            self.list_ref[str(dcount)] = record.id
+            self.dict_ref[str(dcount)] = record.id
             self.list_item.append(format_for_screen(dcount, record.reference))
             dcount += 1
 
@@ -55,6 +53,7 @@ class Screen:
         """ Prepare message for terminal
 
             Parameter   : file (text file for templating)
+            recordset   : recordset to render
 
             return      : string
         """
@@ -62,6 +61,7 @@ class Screen:
         record = {'items': self.list_item}
         jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader('.'))
         template = jinja_env.get_template('scr/' + file)
+
         return template.render(record)
 
     def message_display(self):
@@ -98,12 +98,12 @@ class Screen:
         if resp == '0':
             exit_script()
 
-        if str(resp) not in self.list_ref:
+        if str(resp) not in self.dict_ref:
             return None
 
         else:
 
-            resp = self.list_ref[str(resp)]
+            resp = self.dict_ref[str(resp)]
             return int(resp)
 
 
@@ -114,7 +114,7 @@ class Home_scr(Screen):
     def __init__(self):
 
         Screen.__init__(self)
-        self.list_ref = {'1': 1, '2': 2}
+        self.dict_ref = {'1': 1, '2': 2}
         self.message = self.message_initialize('scr_0.txt')
         self.action(self.message_display())
 
@@ -204,14 +204,14 @@ class Product_details_scr(Screen):
             template = jinja_env.get_template('scr/scr_16.txt')
             message = message + '\n\n' + template.render(record)
 
-            self.list_ref = {'1': 1, '2': 2}
+            self.dict_ref = {'1': 1, '2': 2}
 
         else:
 
             template = jinja_env.get_template('scr/scr_17.txt')
             message = message + '\n\n' + template.render(record)
 
-            self.list_ref = {'1': 2}
+            self.dict_ref = {'1': 2}
 
         return message
 
@@ -245,7 +245,7 @@ class Replacement_save(Screen):
         self.prod_id = prod_id
         self.prod_replacement = repl_id
         Screen.__init__(self)
-        self.list_ref = {'1': 1}
+        self.dict_ref = {'1': 1}
         self.message = self.message_initialize()
         self.action(self.message_display())
 
@@ -280,7 +280,7 @@ class History_scr(Screen):
         self.action(self.message_display())
 
     def fill_references(self, m_query):
-        """ Fill references, list_ref, and list_item
+        """ Fill references, dict_ref, and list_item
             from database query
 
             Parameter :     m_query (recordet)
@@ -297,7 +297,7 @@ class History_scr(Screen):
             self.list_item.append(format_for_screen(dcount, reference))
             dcount += 1
 
-        self.list_ref = {'1': 1}
+        self.dict_ref = {'1': 1}
 
     def action(self, option):
 

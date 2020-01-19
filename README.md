@@ -8,11 +8,21 @@
 - User interface for database's requests and save
 
 
-## INFORMATIONS FOR USERS AND DEVELOPPERS
+## GENERAL INFORMATIONS
 
-- Please copy **`env.sample.py`** to  **`env.py`** and fill your personal informations for database connection.
+- Please use Python 3.6 or later.
+
+- Please note that our MySQL server version is 8.0.16
+
+- Please rename **`env.sample.py`** in **`env.py`** and fill your personal informations for database connection and API requests' length.
+
+- Please, use virtual environment. Follow [this link for further information](https://docs.python.org/fr/3/tutorial/venv.html).
 
 - Please execute **`pip install -r requirements.txt`** in terminal to install proper environment
+
+- Please source **`sql_script.sql`** in mySQL terminal to set database (file joined).
+
+- Please execute **`python db_demo.py`** to launch script that manages API's requests and record in database.
 
 
 ## INFORMATIONS FOR USERS
@@ -27,7 +37,7 @@
 
 - P5_OFF main files are located in **`P5_OFF`** main folder.
 
-- P5_OFF files regarding classes, usual constants and functions are located in **`off`** subfolder.
+- P5_OFF files regarding classes, default constants and functions are located in **`off`** subfolder.
 
 - P5_OFF template text files for user interface in terminal are located in **`scr`** subfolder.
 
@@ -56,8 +66,6 @@
 
 
 ### ABOUT API'S REQUEST AND RECORD IN DATABASE
-
-- Please don't forget to reset database before launching **`db_demo.py`** file.
 
 - Please execute **`db_demo.py`** to launch script that manages API's requests and record in database.
 

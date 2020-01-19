@@ -1,5 +1,5 @@
 # coding: utf-8
-from off.my_constants import conn_source, criterias
+from off.default_constants import conn_source, criterias
 import requests
 from sqlalchemy import inspect
 from off.orm import Product, Session, Category
@@ -20,9 +20,7 @@ class Api_consult:
     def get_results(self, category):
         """
         API's GET consultation
-        parameters :
-        category = searching category
-        quantity = number of results
+        parameters : category = searching category
         """
         url = "https://fr.openfoodfacts.org/cgi/search.pl?"
 

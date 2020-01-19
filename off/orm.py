@@ -1,5 +1,5 @@
 # coding: utf-8
-from off.my_constants import conn_source
+from off.default_constants import conn_source
 from sqlalchemy import CHAR, Column, ForeignKey, String
 from sqlalchemy import create_engine, Index, Boolean
 from sqlalchemy.dialects.mysql import INTEGER
