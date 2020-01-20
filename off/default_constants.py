@@ -40,3 +40,7 @@ criterias = {
     'json': 1
 }
 mess0 = "\nQuel est votre choix ? "
+mess1 = ("Veuillez installer la base de données \n" +
+         "depuis la console MySQL en lançant la commande \n" +
+         "'SOURCE sql_script.sql;' puis relancez \n" +
+         "l'application.")

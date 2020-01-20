@@ -11,9 +11,9 @@ class Screen:
 
         Class variables :
         ---------------
-        message     :   message that will appear in terminal
-        dict_ref    :   link order of appearance to item's id
-        list_item   :   formatted items for screen
+        message     :   string message that will appear in terminal
+        dict_ref    :   dict to link order of appearance to item's id
+        list_item   :   list for formatted items for screen
         dbf         :   initialize class for database's fetching
         dbw         :   initialize class for database's writing
 
@@ -146,7 +146,13 @@ class Category_scr(Screen):
 
 class Product_scr(Screen):
 
-    """ Class for displaying product screen """
+    """ Class for displaying product screen
+
+    Class variables:
+        ---------------
+        id      : integer to reference product's id in use
+        cat_id  : integer to reference category's id in use
+        """
 
     def __init__(self, cat_id):
 
@@ -165,7 +171,15 @@ class Product_scr(Screen):
 class Product_details_scr(Screen):
 
     """ Class for displaying product's details
-        and  suggesting product of replacement """
+        and  suggesting product of replacement
+
+    Class variables:
+        ---------------
+        prod_id             : integer to reference product's id in use
+        cat_id              : integer to reference category's id in use
+        max_nutriscore      : string to reference nutriscore in use
+        prod_replacement    : integer to reference replacement id in use
+        """
 
     def __init__(self, prod_id, cat_id):
         self.prod_id = prod_id
@@ -177,7 +191,11 @@ class Product_details_scr(Screen):
         self.action(self.message_display())
 
     def message_initialize(self):
-
+        """ Prepare message for terminal
+            replace mother class function
+            return : string
+            """
+        # about product's details
         jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader('.'))
         template = jinja_env.get_template('scr/scr_12.txt')
         record = self.dbf.fetch_product_details(self.prod_id)
@@ -192,15 +210,18 @@ class Product_details_scr(Screen):
 
         if self.prod_replacement != 0:
 
+            # about replacement product's details
             template = jinja_env.get_template('scr/scr_15.txt')
             record = self.dbf.fetch_product_details(self.prod_replacement)
             message = message + '\n\n' + template.render(record)
 
+            # about stores
             template = jinja_env.get_template('scr/scr_14.txt')
             record = self.dbf.fetch_product_stores(self.prod_replacement)
             record = {'items': [x for item in record for x in item]}
             message = message + '\n\n' + template.render(record)
 
+            # about user's choice
             template = jinja_env.get_template('scr/scr_16.txt')
             message = message + '\n\n' + template.render(record)
 
@@ -208,6 +229,7 @@ class Product_details_scr(Screen):
 
         else:
 
+            # about best choice
             template = jinja_env.get_template('scr/scr_17.txt')
             message = message + '\n\n' + template.render(record)
 
@@ -238,7 +260,14 @@ class Product_details_scr(Screen):
 
 class Replacement_save(Screen):
 
-    """ Class for displaying record's confirmation """
+    """ Class for displaying record's confirmation
+
+        Class variables:
+        ---------------
+        cat_id              : integer to reference category's id in use
+        prod_id             : integer to reference product's id in use
+        prod_replacement    : integer to reference replacement'id in use
+        """
 
     def __init__(self, cat_id, prod_id, repl_id):
         self.cat_id = cat_id
@@ -250,6 +279,10 @@ class Replacement_save(Screen):
         self.action(self.message_display())
 
     def message_initialize(self):
+        """ prepare message for terminal
+
+            replace mother classe function
+            """
 
         jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader('.'))
         template = jinja_env.get_template('scr/scr_18.txt')
@@ -282,6 +315,8 @@ class History_scr(Screen):
     def fill_references(self, m_query):
         """ Fill references, dict_ref, and list_item
             from database query
+
+            replace mother class method.
 
             Parameter :     m_query (recordet)
         """

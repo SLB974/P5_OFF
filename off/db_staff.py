@@ -1,13 +1,14 @@
 # coding: utf-8
 import random
-from off.default_constants import categories
+from off.default_constants import categories, mess1
 from off.default_functions import format_category, is_category_fr
+from off.default_functions import clear_screen, exit_script
 from off.api_scrapper import Api_consult
 from off.orm import Session, Product, Category, Store
 from off.orm import ProductSave
 from off.orm import CategoriesT, StoresT
 from sqlalchemy.orm import aliased
-from subprocess import PIPE, Popen
+from sqlalchemy.exc import OperationalError
 
 
 class Db_off:
@@ -27,7 +28,7 @@ class Db_off:
         self.session = Session()
         self.product_id = 0
         self.category_id = 0
-        self.store_idstore_id = 0
+        self.store_id = 0
 
     def fetch_store_id(self, store=''):
         """ Fetch id for specified store """
@@ -69,6 +70,35 @@ class Db_fetch(Db_off):
     def __init__(self):
 
         Db_off.__init__(self)
+
+    def verify_database(self):
+        """ verify if database is installed
+
+            if not : print instructions in terminal and exit.
+
+            if installed : verify if API's datas are injected.
+
+            if not :  scrapp API for initial recordset.
+            """
+
+        try:
+            checking = self.fetch_categories()
+
+        except OperationalError:
+
+            checking = False
+
+        if checking is False:
+
+            clear_screen()
+
+            print(mess1)
+
+            exit_script()
+
+        elif len(checking) == 0:
+            dw = Db_write()
+            dw.fill_database_from_api()
 
     def fetch_categories(self):
         """ Fetch my categories from table category """
@@ -162,7 +192,13 @@ class Db_fetch(Db_off):
 
 class Db_write(Db_off):
 
-    """ Class for recording in database """
+    """ Class for recording in database
+
+    Class variables:
+    ---------------
+        doubled_category    :   set to avoid duplicates in category
+        doubled_store       :   set to avoid duplicates in store
+    """
 
     def __init__(self):
 
@@ -170,9 +206,18 @@ class Db_write(Db_off):
         self.doubled_store = set()
         Db_off.__init__(self)
 
+    def fill_database_from_api(self):
+        """ original data importation in database
+            at first use
+            """
+        clear_screen()
+        self.add_my_categories()
+        self.add_product_records()
+
     def add_my_categories(self):
         """ Adding categories choosed from constants.categories
-            and add them to doubled_category set"""
+            and add them to doubled_category set
+            """
 
         for entry in categories:
             insertion = Category(category=entry, my_category=True)

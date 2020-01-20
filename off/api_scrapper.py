@@ -1,5 +1,6 @@
 # coding: utf-8
 from off.default_constants import conn_source, criterias
+from off.default_functions import clear_screen
 import requests
 from sqlalchemy import inspect
 from off.orm import Product, Session, Category
@@ -8,7 +9,15 @@ from off.orm import Product, Session, Category
 class Api_consult:
 
     """
-    Manage API's consultations
+    Manage API's requests
+
+    Class variables:
+    ---------------
+        source          :   connexion source
+        doubled_code    :   set to avoid duplicates in products' code
+        doubled_name    :   set to avoir duplicates in produts' name
+        session         :   initialize a Session to ORM
+
     """
 
     def __init__(self):
@@ -20,7 +29,10 @@ class Api_consult:
     def get_results(self, category):
         """
         API's GET consultation
-        parameters : category = searching category
+
+        parameter : category = searching category
+
+        return : string
         """
         url = "https://fr.openfoodfacts.org/cgi/search.pl?"
 
@@ -34,13 +46,16 @@ class Api_consult:
     def api_scrapp_and_clean(self):
         """ Fetch products from API and clean datas for export to database"""
 
+        clear_screen()
+        print('Votre base de données est vide.')
+
         # Create a mapper that references Product()'s Columns
         mapper = inspect(Product())
 
         # Loop on categories
         for instance in self.session.query(Category).order_by(Category.id):
 
-            print("Filling products for Category " +
+            print("Injection des produits pour la categorie " +
                   str(instance.category)+"...")
 
             response = self.get_results(instance.category)
@@ -48,21 +63,27 @@ class Api_consult:
             # Loop on records in API's response
             for record in response["products"]:
 
+                # Reject duplicates on code and name
+                # and products without nutritionscore
+
                 if record['product_name'].lower().strip() not in \
                     self.doubled_name and record['code'] not in \
                         self.doubled_code and 'nutrition_grade_fr' in record \
                         and record['nutrition_grade_fr'] != '':
 
+                    # Initialize tuple for categories affected to product
                     record_categories = record['categories'].split(',')
                     record_categories = (
                         v for v in record_categories if v != '')
 
+                    # Initialize tuple for stores affected to product
                     record_stores = record['stores'].split(',')
                     record_stores = (v for v in record_stores if v != '')
 
                     record_products = {k: v for (k, v) in record.items()
                                        if k in mapper.attrs and k != "id"}
 
+                    # add code and name to sets for duplicates' check
                     self.doubled_name.add(
                         record_products['product_name'].lower().strip())
                     self.doubled_code.add(record_products['code'])

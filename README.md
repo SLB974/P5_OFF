@@ -7,7 +7,6 @@
 
 - User interface for database's requests and save
 
-
 ## GENERAL INFORMATIONS
 
 - Please use Python 3.6 or later.
@@ -20,10 +19,7 @@
 
 - Please execute **`pip install -r requirements.txt`** in terminal to install proper environment
 
-- Please source **`sql_script.sql`** in mySQL terminal to set database (file joined).
-
-- Please execute **`python db_demo.py`** to launch script that manages API's requests and record in database.
-
+- Please execute command **`SOURCE sql_script.sql;`** in mySQL terminal to set database (file joined).
 
 ## INFORMATIONS FOR USERS
 
@@ -37,12 +33,11 @@
 
 - P5_OFF main files are located in **`P5_OFF`** main folder.
 
-- P5_OFF files regarding classes, default constants and functions are located in **`off`** subfolder.
+- P5_OFF files regarding classes, default constants and functions are located in **`P5_OFF/off`** subfolder.
 
-- P5_OFF template text files for user interface in terminal are located in **`scr`** subfolder.
+- P5_OFF template text files for user interface in terminal are located in **`P5_OFF/scr`** subfolder.
 
 - P5_OFF GitHub repository url : <https://github.com/SLB974/P5_OFF>
-
 
 ### ABOUT USER INTERFACE
 
@@ -52,11 +47,17 @@
 
 - Please see docstrings in **`display.py`** for further information.
 
+- Please note that when attempting to launch main.py :
+
+        - if database off_db is not initialized, programm will alert to install database at first.
+
+        - if database is initialized but empty, programm will run initial filling before launching user interface.
+
 =============================================================================
 
 ### ABOUT DATABASE MANAGEMENT
 
-- Please source **`sql_script.sql`** in mySQL console to reset database (file joined).
+- Please source **`sql_script.sql`** in MySQL terminal to initialize database (file joined).
 
 - **`orm.py`** file contains classes for SQLAlchemy ORM management.
 
@@ -64,10 +65,7 @@
 
 - Please see docstrings in **`db_staff.py`** for further information.
 
-
-### ABOUT API'S REQUEST AND RECORD IN DATABASE
-
-- Please execute **`db_demo.py`** to launch script that manages API's requests and record in database.
+### ABOUT API'S REQUEST
 
 - **`api_scrapper.py`** contains classes for requesting API and cleaning results.
 
