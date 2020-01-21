@@ -105,7 +105,7 @@ class Db_fetch(Db_off):
 
         return (self.session.query
                 (Category.id, Category.category.label('reference'))
-                .filter(Category.my_category == True)
+                .filter(Category.my_category == 1)
                 .order_by(Category.category)
                 .all()
                 )
