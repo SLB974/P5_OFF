@@ -1,16 +1,14 @@
 # coding: utf-8
-from off.display import Home_scr
-from off.db_staff import Db_fetch
+from off.display import HomeScreen
+from off.db_staff import DbFetcher
 
 
 def main():
-    """ Verify if database is OK
-        and run Home screen if so
-        """
+    """Verify if database is OK and run Home screen if so."""
 
-    db = Db_fetch()
+    db = DbFetcher()
     db.verify_database()
-    Home_scr()
+    HomeScreen()
 
 
 if __name__ == "__main__":

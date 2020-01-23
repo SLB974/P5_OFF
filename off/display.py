@@ -1,30 +1,30 @@
 # coding: utf-8
-from off.default_functions import clear_screen, exit_script, format_for_screen
-from off.default_constants import mess0
-from off.db_staff import Db_fetch, Db_write
 import jinja2
+
+from off.default.utils import clear_screen, exit_script, format_for_screen
+from off.default.constants import mess0
+from off.db_staff import DbFetcher, DbWriter
 
 
 class Screen:
+    """Mother Class for displaying.
 
-    """ Mother Class for displaying
+    Class variables :
+    ---------------
+    message     :   string message that will appear in terminal
+    dict_ref    :   dict to link order of appearance to item's id
+    list_item   :   list for formatted items for screen
+    dbf         :   initialize class for database's fetching
+    dbw         :   initialize class for database's writing
 
-        Class variables :
-        ---------------
-        message     :   string message that will appear in terminal
-        dict_ref    :   dict to link order of appearance to item's id
-        list_item   :   list for formatted items for screen
-        dbf         :   initialize class for database's fetching
-        dbw         :   initialize class for database's writing
-
-        Operation :
-        ---------   - Fill references after fetching database if necessary
-                    - Initialize message for terminal
-                    - display message in terminal templating text file(s)
-                    - wait for input response
-                    - verify response's validity (if in link_ref)
-                    - daugther classes manage next screen regarding response
-        """
+    Operation :
+    ---------   - Fill references after fetching database if necessary
+                - Initialize message for terminal
+                - display message in terminal templating text file(s)
+                - wait for input response
+                - verify response's validity (if in link_ref)
+                - daugther classes manage next screen regarding response
+    """
 
     def __init__(self):
 
@@ -32,8 +32,8 @@ class Screen:
         self.dict_ref = {}
         self.list_item = []
         self.choice = 0
-        self.dbf = Db_fetch()
-        self.dbw = Db_write()
+        self.dbf = DbFetcher()
+        self.dbw = DbWriter()
 
     def fill_references(self, m_query):
         """ Fill references, dict_ref, and list_item
@@ -50,12 +50,12 @@ class Screen:
             dcount += 1
 
     def message_initialize(self, file):
-        """ Prepare message for terminal
+        """Prepare message for terminal.
 
-            Parameter   : file (text file for templating)
-            recordset   : recordset to render
+        Parameter   : file (text file for templating)
+        recordset   : recordset to render
 
-            return      : string
+        return      : string
         """
 
         record = {'items': self.list_item}
@@ -65,12 +65,12 @@ class Screen:
         return template.render(record)
 
     def message_display(self):
-        """ Display message in terminal and wait for response
+        """Display message in terminal and wait for response.
 
-            - if non-compliant response then display message again
-            - else return user's choice
+        - if non-compliant response then display message again
+        - else return user's choice
 
-            return      : integer
+        return      : integer
         """
 
         clear_screen()
@@ -86,11 +86,11 @@ class Screen:
             return response
 
     def response(self):
-        """ Wait for user's choice
+        """Wait for user's choice.
 
-            - exit if 0
-            - return None if non-compliant
-            - return item's id linked to user's choice (integer)
+        - exit if 0
+        - return None if non-compliant
+        - return item's id linked to user's choice (integer)
         """
 
         resp = input(self.message + mess0)
@@ -107,71 +107,71 @@ class Screen:
             return int(resp)
 
 
-class Home_scr(Screen):
+class HomeScreen(Screen):
 
-    """ Class for displaying home screen """
+    """Class for displaying home screen."""
 
     def __init__(self):
 
-        Screen.__init__(self)
+        super().__init__()
         self.dict_ref = {'1': 1, '2': 2}
         self.message = self.message_initialize('scr_0.txt')
         self.action(self.message_display())
 
     def action(self, option):
-        """  """
+        """"""
 
         if option == 1:
-            Category_scr()
+            CategoryScreen()
 
         if option == 2:
-            History_scr()
+            HistoryScreen()
 
 
-class Category_scr(Screen):
+class CategoryScreen(Screen):
 
-    """ Class for displaying category screen """
+    """Class for displaying category screen."""
 
     def __init__(self):
 
-        Screen.__init__(self)
+        super().__init__()
         self.fill_references(self.dbf.fetch_categories())
         self.message = self.message_initialize('scr_1.txt')
         self.action(self.message_display())
 
     def action(self, option):
 
-        Product_scr(option)
+        ProductScreen(option)
 
 
-class Product_scr(Screen):
+class ProductScreen(Screen):
 
-    """ Class for displaying product screen
+    """Class for displaying product screen.
 
     Class variables:
         ---------------
         id      : integer to reference product's id in use
         cat_id  : integer to reference category's id in use
-        """
+    """
 
     def __init__(self, cat_id):
 
         self.id = 0
         self.cat_id = cat_id
-        Screen.__init__(self)
+        super().__init__()
         self.fill_references(self.dbf.fetch_products(self.cat_id))
         self.message = self.message_initialize('scr_11.txt')
         self.action(self.message_display())
 
     def action(self, option):
 
-        Product_details_scr(option, self.cat_id)
+        ProductDetailsScreen(option, self.cat_id)
 
 
-class Product_details_scr(Screen):
+class ProductDetailsScreen(Screen):
 
-    """ Class for displaying product's details
-        and  suggesting product of replacement
+    """Class for displaying product's details and  suggesting product of
+    replacement.
 
     Class variables:
         ---------------
@@ -179,14 +179,14 @@ class Product_details_scr(Screen):
         cat_id              : integer to reference category's id in use
         max_nutriscore      : string to reference nutriscore in use
         prod_replacement    : integer to reference replacement id in use
-        """
+    """
 
     def __init__(self, prod_id, cat_id):
         self.prod_id = prod_id
         self.cat_id = cat_id
         self.max_nutriscore = 'f'
         self.prod_replacement = 0
-        Screen.__init__(self)
+        super().__init__()
         self.message = self.message_initialize()
         self.action(self.message_display())
 
@@ -215,7 +215,7 @@ class Product_details_scr(Screen):
             record = self.dbf.fetch_product_details(self.prod_replacement)
             message = message + '\n\n' + template.render(record)
 
-            # about stores
+            # about replacement product's stores
             template = jinja_env.get_template('scr/scr_14.txt')
             record = self.dbf.fetch_product_stores(self.prod_replacement)
             record = {'items': [x for item in record for x in item]}
@@ -238,7 +238,7 @@ class Product_details_scr(Screen):
         return message
 
     def action(self, option):
-        """ Manage what to do regarding response. """
+        """Manage what to do regarding response."""
 
         if option == 1:
 
@@ -247,7 +247,7 @@ class Product_details_scr(Screen):
                 self.prod_replacement
             )
 
-            Replacement_save(
+            ReplacementSave(
                 self.cat_id,
                 self.prod_id,
                 self.prod_replacement
@@ -255,52 +255,52 @@ class Product_details_scr(Screen):
 
         if option == 2:
 
-            Product_scr(self.cat_id)
+            ProductScreen(self.cat_id)
 
 
-class Replacement_save(Screen):
+class ReplacementSave(Screen):
 
-    """ Class for displaying record's confirmation
+    """Class for displaying record's confirmation.
 
-        Class variables:
-        ---------------
-        cat_id              : integer to reference category's id in use
-        prod_id             : integer to reference product's id in use
-        prod_replacement    : integer to reference replacement'id in use
-        """
+    Class variables:
+    ---------------
+    cat_id              : integer to reference category's id in use
+    prod_id             : integer to reference product's id in use
+    prod_replacement    : integer to reference replacement'id in use
+    """
 
     def __init__(self, cat_id, prod_id, repl_id):
         self.cat_id = cat_id
         self.prod_id = prod_id
         self.prod_replacement = repl_id
-        Screen.__init__(self)
+        super().__init__()
         self.dict_ref = {'1': 1}
         self.message = self.message_initialize()
         self.action(self.message_display())
 
     def message_initialize(self):
-        """ prepare message for terminal
+        """prepare message for terminal.
 
-            replace mother classe function
-            """
+        replace mother classe function
+        """
 
         jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader('.'))
         template = jinja_env.get_template('scr/scr_18.txt')
         return template.render()
 
     def action(self, option):
-        """ Manage what to do regarding response. """
+        """Manage what to do regarding response."""
 
-        Home_scr()
+        HomeScreen()
 
 
-class History_scr(Screen):
+class HistoryScreen(Screen):
 
-    """ Class for displaying recorded substitutions """
+    """Class for displaying recorded substitutions."""
 
     def __init__(self):
 
-        Screen.__init__(self)
+        super().__init__()
         self.fill_references(self.dbf.fetch_replacement_records())
 
         if len(self.list_item) != 0:
@@ -313,12 +313,11 @@ class History_scr(Screen):
         self.action(self.message_display())
 
     def fill_references(self, m_query):
-        """ Fill references, dict_ref, and list_item
-            from database query
+        """Fill references, dict_ref, and list_item from database query.
 
-            replace mother class method.
+        replace mother class method.
 
-            Parameter :     m_query (recordet)
+        Parameter :     m_query (recordet)
         """
 
         dcount = 1
@@ -336,4 +335,4 @@ class History_scr(Screen):
 
     def action(self, option):
 
-        Home_scr()
+        HomeScreen()

@@ -1,19 +1,20 @@
 # coding: utf-8
 import random
-from off.default_constants import categories, mess1
-from off.default_functions import format_category, is_category_fr
-from off.default_functions import clear_screen, exit_script
-from off.api_scrapper import Api_consult
-from off.orm import Session, Product, Category, Store
-from off.orm import ProductSave
-from off.orm import CategoriesT, StoresT
+
 from sqlalchemy.orm import aliased
 from sqlalchemy.exc import OperationalError
 
+from off.default.constants import categories, mess1
+from off.default.utils import format_category, is_category_fr
+from off.default.utils import clear_screen, exit_script
+from off.api_scrapper import ApiConsulter
+from off.orm import Session, Product, Category, Store
+from off.orm import ProductSave
+from off.orm import CategoriesT, StoresT
 
-class Db_off:
 
-    """ Mother Class for fetching and writing database
+class DbOff:
+    """Mother Class for fetching and writing database.
 
     Class variables:
     ---------------
@@ -21,7 +22,6 @@ class Db_off:
         product_id  :   integer to reference product id in use
         category_id :   integer to reference catefory_id in use
         store_id    :   integer to reference store id in use
-
     """
 
     def __init__(self):
@@ -31,7 +31,7 @@ class Db_off:
         self.store_id = 0
 
     def fetch_store_id(self, store=''):
-        """ Fetch id for specified store """
+        """Fetch id for specified store."""
 
         instance = (self.session.query(Store)
                     . filter(Store.store == store)
@@ -41,7 +41,7 @@ class Db_off:
         return instance.id
 
     def fetch_category_id(self, cat=''):
-        """ fetch id for specified category """
+        """fetch id for specified category."""
 
         instance = (self.session.query(Category)
                     .filter(Category.category == cat)
@@ -51,7 +51,7 @@ class Db_off:
         return instance.id
 
     def reset_database(self):
-        """ delete records from every table """
+        """delete records from every table."""
 
         self.session.query(CategoriesT).delete(synchronize_session=False)
         self.session.query(StoresT).delete(synchronize_session=False)
@@ -63,23 +63,22 @@ class Db_off:
         self.session.close()
 
 
-class Db_fetch(Db_off):
-
-    """ Class for fetching database """
+class DbFetcher(DbOff):
+    """Class for fetching database."""
 
     def __init__(self):
 
-        Db_off.__init__(self)
+        super().__init__()
 
     def verify_database(self):
-        """ verify if database is installed
+        """verify if database is installed.
 
-            if not : print instructions in terminal and exit.
+        if not : print instructions in terminal and exit.
 
-            if installed : verify if API's datas are injected.
+        if installed : verify if API's datas are injected.
 
-            if not :  scrapp API for initial recordset.
-            """
+        if not :  scrapp API for initial recordset.
+        """
 
         try:
             checking = self.fetch_categories()
@@ -97,11 +96,11 @@ class Db_fetch(Db_off):
             exit_script()
 
         elif len(checking) == 0:
-            dw = Db_write()
+            dw = DbWriter()
             dw.fill_database_from_api()
 
     def fetch_categories(self):
-        """ Fetch my categories from table category """
+        """Fetch my categories from table category."""
 
         return (self.session.query
                 (Category.id, Category.category.label('reference'))
@@ -111,7 +110,7 @@ class Db_fetch(Db_off):
                 )
 
     def fetch_products(self, cat_id):
-        """ Fetch products for specified category """
+        """Fetch products for specified category."""
 
         return (self.session.query
                 (Product.id, Product.product_name.label('reference'))
@@ -122,7 +121,7 @@ class Db_fetch(Db_off):
                 )
 
     def fetch_product_details(self, prod_id):
-        """ Fetch details for specified product id """
+        """Fetch details for specified product id."""
 
         return (self.session.query(Product)
                     .filter(Product.id == prod_id)
@@ -130,7 +129,7 @@ class Db_fetch(Db_off):
                 ).__dict__
 
     def fetch_product_categories(self, prod_id):
-        """ Fetch categories for specified product """
+        """Fetch categories for specified product."""
 
         return (self.session.query
                 (Category.category.label('reference'))
@@ -141,7 +140,7 @@ class Db_fetch(Db_off):
                 )
 
     def fetch_product_stores(self, prod_id):
-        """ Fetch stores for specified product """
+        """Fetch stores for specified product."""
 
         return (self.session.query
                 (Store.store.label('reference'))
@@ -152,11 +151,8 @@ class Db_fetch(Db_off):
                 )
 
     def fetch_product_replacement(self, prod_id, cat_id,  max_nutriscore):
-        """ Fetch random product for replacement
-            for a different product
-            in same category
-            with a minus nutriscore value
-            """
+        """Fetch random product for replacement for a different product in same
+        category with a minus nutriscore value."""
 
         query = (self.session.query
                  (Product.id.label('id'),
@@ -176,7 +172,7 @@ class Db_fetch(Db_off):
             return randomrow.id
 
     def fetch_replacement_records(self):
-        """ Fetch replacement recorded in database """
+        """Fetch replacement recorded in database."""
 
         Prod_rep = aliased(Product)
 
@@ -190,9 +186,8 @@ class Db_fetch(Db_off):
                 )
 
 
-class Db_write(Db_off):
-
-    """ Class for recording in database
+class DbWriter(DbOff):
+    """Class for recording in database.
 
     Class variables:
     ---------------
@@ -204,20 +199,17 @@ class Db_write(Db_off):
 
         self.doubled_category = set()
         self.doubled_store = set()
-        Db_off.__init__(self)
+        super().__init__()
 
     def fill_database_from_api(self):
-        """ original data importation in database
-            at first use
-            """
+        """original data importation in database at first use."""
         clear_screen()
         self.add_my_categories()
         self.add_product_records()
 
     def add_my_categories(self):
-        """ Adding categories choosed from constants.categories
-            and add them to doubled_category set
-            """
+        """Adding categories choosed from constants.categories and add them to
+        doubled_category set."""
 
         for entry in categories:
             insertion = Category(category=entry, my_category=True)
@@ -227,9 +219,9 @@ class Db_write(Db_off):
         self.session.commit()
 
     def add_product_records(self):
-        """ save products in database """
+        """save products in database."""
 
-        api = Api_consult()
+        api = ApiConsulter()
 
         for record in api.api_scrapp_and_clean():
 
@@ -250,7 +242,7 @@ class Db_write(Db_off):
         self.session.close()
 
     def add_categories_record(self, record_categories):
-        """ add referenced categories in product records """
+        """add referenced categories in product records."""
 
         for instance in record_categories:
 
@@ -274,14 +266,14 @@ class Db_write(Db_off):
                 self.add_product_category()
 
     def add_product_category(self):
-        """ add categories linked with product in table CategoriesT """
+        """add categories linked with product in table CategoriesT."""
 
         insertion = CategoriesT(
             product_id=self.product_id, category_id=self.category_id)
         self.session.add(insertion)
 
     def add_stores_record(self, record_stores):
-        """ add referenced stores in product's records """
+        """add referenced stores in product's records."""
 
         for instance in record_stores:
 
@@ -303,13 +295,14 @@ class Db_write(Db_off):
                 self.add_product_store()
 
     def add_product_store(self):
-        """ add stores linked with product in table CategoriesT """
+        """add stores linked with product in table CategoriesT."""
 
         insertion = StoresT(product_id=self.product_id,
                             store_id=self.store_id)
         self.session.add(insertion)
 
     def add_product_substitution(self, prod_id, rep_id):
+        """add replacement product for product in ProducSave."""
 
         insertion = (ProductSave(
             product_id=prod_id,

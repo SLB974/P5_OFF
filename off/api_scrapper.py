@@ -1,15 +1,15 @@
 # coding: utf-8
-from off.default_constants import conn_source, criterias
-from off.default_functions import clear_screen
 import requests
+
 from sqlalchemy import inspect
+
+from off.default.constants import conn_source, criterias
+from off.default.utils import clear_screen
 from off.orm import Product, Session, Category
 
 
-class Api_consult:
-
-    """
-    Manage API's requests
+class ApiConsulter:
+    """Manage API's requests.
 
     Class variables:
     ---------------
@@ -17,7 +17,6 @@ class Api_consult:
         doubled_code    :   set to avoid duplicates in products' code
         doubled_name    :   set to avoir duplicates in produts' name
         session         :   initialize a Session to ORM
-
     """
 
     def __init__(self):
@@ -27,8 +26,7 @@ class Api_consult:
         self.session = Session()
 
     def get_results(self, category):
-        """
-        API's GET consultation
+        """API's GET consultation.
 
         parameter : category = searching category
 
@@ -44,7 +42,7 @@ class Api_consult:
         return response
 
     def api_scrapp_and_clean(self):
-        """ Fetch products from API and clean datas for export to database"""
+        """Fetch products from API and clean datas for export to database."""
 
         clear_screen()
         print('Votre base de données est vide.')

@@ -1,15 +1,14 @@
 # coding: utf-8
-from off.default_constants import conn_source
 from sqlalchemy import CHAR, Column, ForeignKey, String
 from sqlalchemy import create_engine, Index, Boolean
 from sqlalchemy.dialects.mysql import INTEGER
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
-"""
-Manage ORM
-"""
+from off.default.constants import conn_source
+
+"""Manage ORM"""
 engine = create_engine(conn_source)
 Session = sessionmaker(bind=engine, autoflush=True)
 Base = declarative_base()

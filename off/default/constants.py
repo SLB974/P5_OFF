@@ -2,12 +2,10 @@
 from env import login, password, host, dbase
 from env import quantity_of_records_to_fetch
 
-"""
-Constants for off_api
-"""
+"""Constants for off_api"""
 conn_source = f"mysql://{login}:{password}@{host}/{dbase}?charset=utf8mb4"
 categories = ["Fromages blancs", "Poissons", "Nouilles",
-              "Pizzas", "Boissons", "Epicerie"]
+              "Pizzas", "Boissons", "Epicerie", "Fromages"]
 criterias = {
     'search_simple': 1,
     'action': 'process',

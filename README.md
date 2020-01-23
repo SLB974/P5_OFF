@@ -33,7 +33,9 @@
 
 - P5_OFF main files are located in **`P5_OFF`** main folder.
 
-- P5_OFF files regarding classes, default constants and functions are located in **`P5_OFF/off`** subfolder.
+- P5_OFF contants.py and utils.py are located in **``P5_OFF/default``**
+
+- P5_OFF files regarding classes are located in **`P5_OFF/off`** subfolder.
 
 - P5_OFF template text files for user interface in terminal are located in **`P5_OFF/scr`** subfolder.
 
