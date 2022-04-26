@@ -3,4 +3,4 @@
 env.py
 __pycache__
 .editor config
-
+.mypy_cache/
