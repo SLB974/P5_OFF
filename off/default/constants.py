@@ -1,9 +1,6 @@
 # coding: utf-8
-from env import login, password, host, dbase
-from env import quantity_of_records_to_fetch
 
 """Constants for off_api"""
-conn_source = f"mysql://{login}:{password}@{host}/{dbase}?charset=utf8mb4"
 categories = ["Fromages blancs", "Poissons", "Nouilles",
               "Pizzas", "Boissons", "Epicerie", "Fromages"]
 criterias = {
@@ -34,11 +31,7 @@ criterias = {
     'tag_contains_7': 'contains',
     'tag_7': 'fr',
     # 'sort_by': 'unique_scans_n',
-    'page_size': quantity_of_records_to_fetch,
+    'page_size': 150,
     'json': 1
 }
-mess0 = "\nQuel est votre choix ? "
-mess1 = ("Veuillez installer la base de données \n" +
-         "depuis la console MySQL en lançant la commande \n" +
-         "'SOURCE sql_script.sql;' puis relancez \n" +
-         "l'application.")
+

@@ -59,7 +59,7 @@ class DbOff:
         self.session.query(Store).delete(synchronize_session=False)
         self.session.query(Category).delete(synchronize_session=False)
         self.session.query(Product).delete(synchronize_session=False)
-        self.session.commit()
+        self.session.commit() 
         self.session.close()
 
 

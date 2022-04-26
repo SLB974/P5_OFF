@@ -2,4 +2,5 @@
 .vscode/
 env.py
 __pycache__
+.editor config
 
